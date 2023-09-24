@@ -9,16 +9,15 @@ Compile & Run:
 javac -d out ./src/pulse/*.java
 ``` 
 ```
-java -classpath out pulse.Pulse
+java -classpath out pulse.Pulse [sourcefile]
 ```
 - (Can also just open as an IntelliJ IDEA project)
 
-Use:
- 1. Pass a file as an argument and evaluate a single expression from it, or
- 2. No arguments: run a REPL which evaluates each expression entered.
+Usage:
+ 1. Pass a file as an argument and evaluates each statement from it, or
+ 2. No arguments: run a REPL which evaluates each statement entered.
 
 Notes:
- - Prefer using the REPL (no arguments)
  - Source -> Scanner -> Parser -> Interpreter
- - Expressions are built into a syntax tree by the parser and evaluated by post-order traversal
- - Evaluation of expressions are performed using the Visitor Design Pattern
+ - Statements and Expressions are built into a syntax tree by the parser and evaluated by post-order traversal
+ - Evaluation of expressions and statements are performed using the Visitor Design Pattern
