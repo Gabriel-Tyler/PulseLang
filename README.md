@@ -10,5 +10,5 @@ Use:
 Notes:
  - Prefer using the REPL (no arguments)
  - Source -> Scanner -> Parser -> Interpreter
- - Expressions are built into a syntax tree and evaluated by post-order traversal
+ - Expressions are built into a syntax tree by the parser and evaluated by post-order traversal
  - Evaluation of expressions are performed using the Visitor Design Pattern
