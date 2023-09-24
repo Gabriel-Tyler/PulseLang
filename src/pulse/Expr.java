@@ -3,7 +3,6 @@ package pulse;
 import java.util.List;
 
 abstract class Expr {
-
     abstract <R> R accept(Visitor<R> visitor);
 
     interface Visitor<R> {
@@ -29,6 +28,7 @@ abstract class Expr {
             this.right = right;
         }
     }
+
     static class Grouping extends Expr {
         @Override
         <R> R accept(Visitor<R> visitor) {
@@ -41,6 +41,7 @@ abstract class Expr {
             this.expression = expression;
         }
     }
+
     static class Literal extends Expr {
         @Override
         <R> R accept(Visitor<R> visitor) {
@@ -53,6 +54,7 @@ abstract class Expr {
             this.value = value;
         }
     }
+
     static class Unary extends Expr {
         @Override
         <R> R accept(Visitor<R> visitor) {
@@ -67,4 +69,5 @@ abstract class Expr {
             this.right = right;
         }
     }
+
 }

@@ -55,7 +55,7 @@ public class Pulse {
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // stop if there was a syntax error
         if (hadError)
@@ -66,7 +66,7 @@ public class Pulse {
 
         // "You are my creator, but I am your master; Obey!"
         // EVALUATE THE EXPRESSION!
-        interpreter.interpret(expression); // "It's alive!"
+        interpreter.interpret(statements); // "It's alive!"
     }
 
     private static void report(int line, String where, String message) {
