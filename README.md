@@ -5,9 +5,13 @@ Pulse Programming Language based on the book Crafting Interpreters:
 
 Compile & Run:
 
- $ `javac -d out ./src/pulse/*.java` \
- $ `java -classpath out pulse.Pulse`
-
+```
+javac -d out ./src/pulse/*.java
+``` 
+```
+java -classpath out pulse.Pulse
+```
+- (Can also just open as an IntelliJ IDEA project)
 
 Use:
  1. Pass a file as an argument and evaluate a single expression from it, or
