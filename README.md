@@ -3,6 +3,12 @@
 Pulse Programming Language based on the book Crafting Interpreters: 
  - https://craftinginterpreters.com/contents.html 
 
+Compile & Run:
+
+ $ `javac -d out ./src/pulse/*.java` \
+ $ `java -classpath out pulse.Pulse`
+
+
 Use:
  1. Pass a file as an argument and evaluate a single expression from it, or
  2. No arguments: run a REPL which evaluates each expression entered.
