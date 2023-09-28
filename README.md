@@ -16,6 +16,7 @@ java -classpath out pulse.Pulse [sourcefile]
 Usage:
  1. Pass a file as an argument and evaluates each statement from it, or
  2. No arguments: run a REPL which evaluates each statement entered.
+     - Enter `exit` to exit program. 
 
 Notes:
  - Source -> Scanner -> Parser -> Interpreter

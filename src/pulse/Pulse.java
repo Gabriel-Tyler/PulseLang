@@ -42,7 +42,7 @@ public class Pulse {
         while (true) {
             System.out.print("> ");
             String line = reader.readLine();
-            if (line == null)
+            if (line == null || line.equals("exit"))
                 break;
             run(line);
             hadError = false;
