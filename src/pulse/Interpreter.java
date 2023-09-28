@@ -9,7 +9,7 @@ import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>,
                              Stmt.Visitor<Void> {
-    private Environment environment = new Environment();
+    private final Environment environment = new Environment();
 
     void interpret(List<Stmt> statements) {
         try {
