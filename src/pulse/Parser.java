@@ -41,11 +41,10 @@ public class Parser {
     // program -> declaration* EOF ;
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
-        while (!isAtEnd()) {
+        while (!isAtEnd())
             statements.add(declaration());
-}       return statements;
+        return statements;
     }
-
 
     // declaration -> varDecl | statement ;
     private Stmt declaration() {
@@ -59,7 +58,7 @@ public class Parser {
         }
     }
 
-    // varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
+    // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
     private Stmt varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
 
@@ -166,6 +165,9 @@ public class Parser {
 
         if (match(NUMBER, STRING))
             return new Expr.Literal(previous().literal);
+
+        if (match(IDENTIFIER))
+            return new Expr.Variable(previous());
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
