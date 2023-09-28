@@ -9,6 +9,7 @@ import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>,
                              Stmt.Visitor<Void> {
+    private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements) {
         try {
@@ -104,7 +105,7 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return null;
+        return environment.get(expr.name);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
@@ -119,10 +120,12 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     private Object evaluate(Expr expr) {
+        // dispatch on the type of expr
         return expr.accept(this);
     }
 
     private void execute(Stmt stmt) {
+        // dispatch on the type of stmt
         stmt.accept(this);
     }
 
@@ -141,6 +144,10 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null)
+            value = evaluate(stmt.initializer);
+        environment.define(stmt.name.lexeme, value);
         return null;
     }
 
