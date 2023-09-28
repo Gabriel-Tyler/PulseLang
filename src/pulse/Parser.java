@@ -1,8 +1,11 @@
 /*
-program    -> statement* EOF ;
+program    -> declaration* EOF ;
+
+declaration -> varDecl | statement ;
+
+varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
 
 statement  -> exprStmt | printStmt ;
-
 exprStmt   -> expression ";" ;
 printStmt  -> "print" expression ";" ;
 
@@ -13,7 +16,8 @@ term       -> factor ( ( "-" | "+" ) factor )* ;
 factor     -> unary ( ( "/" | "*" ) unary )* ;
 unary      -> ( "!" | "-" ) unary | primary ;
 primary    -> NUMBER | STRING | "true" | "false" | "nil"
-            | "(" expression ")" ;
+            | "(" expression ")"
+            | IDENTIFIER ;
  */
 
 package pulse;
@@ -34,17 +38,37 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    // program -> statement* EOF ;
+    // program -> declaration* EOF ;
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
-            statements.add(statement());
+            statements.add(declaration());
 }       return statements;
     }
 
-    // expression -> equality ;
-    private Expr expression() {
-        return equality();
+
+    // declaration -> varDecl | statement ;
+    private Stmt declaration() {
+        try {
+            if (match(VAR))
+                return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
+    // varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL))
+            initializer = expression();
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
     }
 
     // statement -> exprStmt | printStmt ;
@@ -66,6 +90,11 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    // expression -> equality ;
+    private Expr expression() {
+        return equality();
     }
 
     // equality -> comparison ( ( "!=" | "==" ) comparison )* ;
