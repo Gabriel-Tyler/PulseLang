@@ -2,21 +2,22 @@
 program    -> declaration* EOF ;
 
 declaration -> varDecl | statement ;
-
 varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
+statement  -> exprStmt | printStmt | block;
 
-statement  -> exprStmt | printStmt ;
 exprStmt   -> expression ";" ;
 printStmt  -> "print" expression ";" ;
+block      -> "{" declaration* "}" ;
 
 expression -> assignment ;
-assignment -> IDENTIFIER "=" assignment
-            | equality ;
+
+assignment -> IDENTIFIER "=" assignment | equality ;
 equality   -> comparison ( ( "!=" | "==" ) comparison )* ;
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term       -> factor ( ( "-" | "+" ) factor )* ;
 factor     -> unary ( ( "/" | "*" ) unary )* ;
 unary      -> ( "!" | "-" ) unary | primary ;
+
 primary    -> NUMBER | STRING | "true" | "false" | "nil"
             | "(" expression ")"
             | IDENTIFIER ;
@@ -72,10 +73,12 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    // statement -> exprStmt | printStmt ;
+    // statement -> exprStmt | printStmt | block;
     private Stmt statement() {
         if (match(PRINT))
             return printStatement();
+        if (match(LEFT_BRACE))
+            return new Stmt.Block(block());
         return expressionStatement();
     }
 
@@ -91,6 +94,17 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    // block -> "{" declaration* "}" ;
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd())
+            statements.add(declaration());
+
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
     }
 
     // expression -> assignment ;
