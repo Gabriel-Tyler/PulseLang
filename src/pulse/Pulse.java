@@ -50,7 +50,6 @@ public class Pulse {
     }
     private static void run(String source) {
         // scanning, parsing, and execution
-
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
@@ -61,12 +60,10 @@ public class Pulse {
         if (hadError)
             return;
 
-        // print the lisp-like syntax tree
-        // System.out.println(new AstPrinter().print(expression));
-
         // "You are my creator, but I am your master; Obey!"
-        // EVALUATE THE EXPRESSION!
-        interpreter.interpret(statements); // "It's alive!"
+        // RUN THE PROGRAM
+        interpreter.interpret(statements);
+        // "It's alive!"
     }
 
     private static void report(int line, String where, String message) {

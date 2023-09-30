@@ -12,13 +12,16 @@ block      -> "{" declaration* "}" ;
 
 expression -> assignment ;
 
-assignment -> IDENTIFIER "=" assignment | equality ;
+assignment -> IDENTIFIER "=" assignment | logic_or ;
+
+logic_or   -> logic_and ( "or" logic_and)* ;
+logic_and  -> equality ( "and" equality)* ;
+
 equality   -> comparison ( ( "!=" | "==" ) comparison )* ;
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term       -> factor ( ( "-" | "+" ) factor )* ;
 factor     -> unary ( ( "/" | "*" ) unary )* ;
 unary      -> ( "!" | "-" ) unary | primary ;
-
 primary    -> NUMBER | STRING | "true" | "false" | "nil"
             | "(" expression ")"
             | IDENTIFIER ;
@@ -129,9 +132,9 @@ public class Parser {
         return assignment();
     }
 
-    // assignment -> IDENTIFIER "=" assignment | equality ;
+    // assignment -> IDENTIFIER "=" assignment | logic_or ;
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = or();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -145,6 +148,27 @@ public class Parser {
             error(equals, "Invalid assignment target.");
         }
 
+        return expr;
+    }
+
+    // logic_or -> logic_and ( "or" logic_and)* ;
+    private Expr or() {
+        Expr expr = and();
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+        return expr;
+    }
+    // logic_and -> equality ( "and" equality)* ;
+    private Expr and() {
+        Expr expr = equality();
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
         return expr;
     }
 
