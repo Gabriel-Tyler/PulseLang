@@ -3,12 +3,18 @@ program    -> declaration* EOF ;
 
 declaration -> varDecl | statement ;
 varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
-statement  -> exprStmt | ifStmt | printStmt | whileStmt | block;
+statement  -> exprStmt | ifStmt | printStmt
+            | whileStmt | forStmt | block;
 
 exprStmt   -> expression ";" ;
 ifStmt     -> "if" "(" expression ")" statement ( "else" statement )? ;
 printStmt  -> "print" expression ";" ;
 block      -> "{" declaration* "}" ;
+
+whileStmt  -> "while" "(" expression ")" statement ;
+forStmt    -> "for" "(" ( varDecl | exprStmt | ";" )
+              expression? ";"
+              expression? ")" statement ;
 
 expression -> assignment ;
 
@@ -30,6 +36,7 @@ primary    -> NUMBER | STRING | "true" | "false" | "nil"
 package pulse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static pulse.TokenType.*;
@@ -77,7 +84,8 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    // statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
+    // statement -> exprStmt | ifStmt | printStmt
+    //            | whileStmt | forStmt | block;
     private Stmt statement() {
         if (match(IF))
             return ifStatement();
@@ -85,6 +93,8 @@ public class Parser {
             return printStatement();
         if (match(WHILE))
             return whileStatement();
+        if (match(FOR))
+            return forStatement();
         if (match(LEFT_BRACE))
             return new Stmt.Block(block());
         return expressionStatement();
@@ -111,6 +121,7 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
+    // whileStmt  -> "while" "(" expression ")" statement ;
     private Stmt whileStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
@@ -118,6 +129,48 @@ public class Parser {
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
+    }
+    // forStmt    -> "for" "(" ( varDecl | exprStmt | ";" )
+    //                expression? ";"
+    //                expression? ")" statement ;
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Stmt initializer;
+        if (match(SEMICOLON))
+            initializer = null;
+        else if (match(VAR))
+            initializer = varDeclaration();
+        else
+            initializer = expressionStatement();
+
+        Expr condition = null;
+        if (!check(SEMICOLON))
+            condition = expression();
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        Expr increment = null;
+        if (!check(RIGHT_PAREN))
+            increment = expression();
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        Stmt body = statement();
+
+        if (increment != null)
+            body = new Stmt.Block(
+                Arrays.asList(
+                    body,
+                    new Stmt.Expression(increment)));
+
+        if (condition == null)
+            condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+        if (initializer != null)
+            body = new Stmt.Block(
+                Arrays.asList(initializer, body));
+
+        return body;
     }
 
     // exprStmt -> expression ";" ;
