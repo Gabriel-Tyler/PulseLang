@@ -1,2 +1,5 @@
-print "hello" or 100;
-print nil or "yes";
+var x = 10;
+while (x >= 0) {
+    print x;
+    x = x - 1;
+}
