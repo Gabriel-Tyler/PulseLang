@@ -316,7 +316,7 @@ public class Parser {
             if (match(LEFT_PAREN)) {
                 callee = finishCall(callee);
             } else if (match(LEFT_SQUARE)) {
-                Expr index = primary();
+                Expr index = expression();
                 Token closeBracket = consume(RIGHT_SQUARE,
                     "Expected ']' after subscript index.");
                 callee = new Expr.Subscript(callee, closeBracket, index);
