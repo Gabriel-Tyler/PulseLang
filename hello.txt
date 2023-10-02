@@ -1,5 +1,18 @@
-fun say(s1, s2) {
-    print s1 + ", " + s2 + "!";
+fun fib(n) {
+    var a = 0;
+    var b = 1;
+    if (n == 0)
+        return a;
+    if (n == 1)
+        return b;
+    for (var i = 2; i <= n; i = i + 1) {
+        var t = b;
+        b = a + b;
+        a = t;
+    }
+    return b;
 }
 
-say("hi", "mom");
+for (var i = 0; i <= 6; i = i + 1) {
+    print "fib(" + i + ") = " + fib(i);
+}
