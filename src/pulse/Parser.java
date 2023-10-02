@@ -256,6 +256,11 @@ public class Parser {
                 return new Expr.Assign(name, value);
             }
 
+            if (expr instanceof Expr.Subscript) {
+                Expr.Subscript set = (Expr.Subscript)expr;
+                return new Expr.Set(set, set.name, value);
+            }
+
             error(equals, "Invalid assignment target.");
         }
 

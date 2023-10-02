@@ -160,6 +160,25 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        if (expr.object instanceof Expr.Subscript) {
+
+            List<Object> list = (List<Object>)evaluate(((Expr.Subscript)expr.object).object);
+
+            Object indexObject = evaluate(((Expr.Subscript)expr.object).value);
+
+            int index = ((Double)indexObject).intValue();
+            if (index >= list.size()) {
+                throw new RuntimeError(expr.name,
+                    "Array index out of range.");
+            }
+
+            list.set(index, evaluate(expr.right));
+        }
+        return null;
+    }
+
+    @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
         Object right = evaluate(expr.right);
 
