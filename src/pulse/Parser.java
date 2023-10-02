@@ -10,12 +10,13 @@ parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 varDecl    -> "var" IDENTIFIER ( "=" expression )? ";" ;
 
 statement  -> exprStmt | ifStmt | printStmt
-            | whileStmt | forStmt | block;
+            | whileStmt | forStmt | block | returnStmt ;
 
 exprStmt   -> expression ";" ;
 ifStmt     -> "if" "(" expression ")" statement ( "else" statement )? ;
 printStmt  -> "print" expression ";" ;
 block      -> "{" declaration* "}" ;
+returnStmt -> "return" expression? ";" ;
 
 whileStmt  -> "while" "(" expression ")" statement ;
 forStmt    -> "for" "(" ( varDecl | exprStmt | ";" )
@@ -97,18 +98,14 @@ public class Parser {
     }
 
     // statement -> exprStmt | ifStmt | printStmt
-    //            | whileStmt | forStmt | block;
+    //            | whileStmt | forStmt | block | returnStmt;
     private Stmt statement() {
-        if (match(IF))
-            return ifStatement();
-        if (match(PRINT))
-            return printStatement();
-        if (match(WHILE))
-            return whileStatement();
-        if (match(FOR))
-            return forStatement();
-        if (match(LEFT_BRACE))
-            return new Stmt.Block(block());
+        if (match(IF))         return ifStatement();
+        if (match(PRINT))      return printStatement();
+        if (match(WHILE))      return whileStatement();
+        if (match(FOR))        return forStatement();
+        if (match(RETURN))     return returnStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
 
@@ -182,6 +179,17 @@ public class Parser {
                 Arrays.asList(initializer, body));
 
         return body;
+    }
+
+    // returnStmt -> "return" expression? ";" ;
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON))
+            value = expression();
+
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     // exprStmt -> expression ";" ;
