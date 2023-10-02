@@ -3,6 +3,7 @@ package pulse;
 enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+    LEFT_SQUARE, RIGHT_SQUARE,
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 
     // One or two character tokens.
@@ -15,7 +16,7 @@ enum TokenType {
     IDENTIFIER, STRING, NUMBER,
 
     // Keywords.
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+    CLASS, FALSE, FUN, FOR, IF, ELSE, NIL, AND, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
     EOF

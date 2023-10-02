@@ -39,13 +39,17 @@ unary      -> ( "!" | "-" ) unary | call ;
 call       -> primary ( "(" arguments? ")" )* ;
 arguments  -> expression ( "," expression )* ;
 
+array      -> "[" expression ( "," expression )* "]" ;
+
 primary    -> NUMBER | STRING | "true" | "false" | "nil"
             | "(" expression ")"
+            | array
             | IDENTIFIER ;
  */
 
 package pulse;
 
+import javax.lang.model.type.TypeKind;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -352,16 +356,23 @@ public class Parser {
     }
     // call -> primary ( "(" arguments? ")" )* ;
     private Expr call() {
-        Expr expr = primary();
+        Expr callee = primary();
         while (true) {
-            if (match(LEFT_PAREN))
-                expr = finishCall(expr);
-            else
+            if (match(LEFT_PAREN)) {
+                callee = finishCall(callee);
+            } else if (match(LEFT_SQUARE)) {
+                Expr index = primary();
+                Token closeBracket = consume(RIGHT_SQUARE,
+                    "Expected ']' after subscript index.");
+                callee = new Expr.Subscript(callee, closeBracket, index);
+            } else {
                 break;
+            }
         }
-        return expr;
+        return callee;
     }
-    // primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    // primary -> NUMBER | STRING | "true" | "false" | "nil"
+    //          | array | "(" expression ")" ;
     private Expr primary() {
         if (match(FALSE))
             return new Expr.Literal(false);
@@ -380,6 +391,20 @@ public class Parser {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
+        }
+
+        if (match(LEFT_SQUARE)) {
+            List<Expr> values = new ArrayList<>();
+            if (match(RIGHT_SQUARE))
+                return new Expr.Array(null);
+            while (!match(RIGHT_SQUARE)) {
+                Expr value = expression();
+                values.add(value);
+                if (peek().type != RIGHT_SQUARE)
+                    consume(COMMA,
+                        "Expected a comma before next expression.");
+            }
+            return new Expr.Array(values);
         }
 
         throw error(peek(), "Expect expression.");

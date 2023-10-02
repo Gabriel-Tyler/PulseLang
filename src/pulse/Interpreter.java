@@ -182,6 +182,40 @@ class Interpreter implements Expr.Visitor<Object>,
         return environment.get(expr.name);
     }
 
+    @Override
+    public Object visitArrayExpr(Expr.Array expr) {
+        List<Object> values = new ArrayList<>();
+        if (expr.values != null) {
+            for (Expr value : expr.values)
+                values.add(evaluate(value));
+        }
+        return values;
+    }
+
+    @Override
+    public Object visitSubscriptExpr(Expr.Subscript expr) {
+        List<Object> list = null;
+        try {
+            list = (List<Object>)evaluate(expr.object);
+        } catch (Exception e) {
+            throw new RuntimeError(expr.name, "Only arrays can be subscripted");
+        }
+
+        Object indexObject = evaluate(expr.value);
+        if (!(indexObject instanceof Double)) {
+            throw new RuntimeError(expr.name,
+                "Only numbers can be used to index an array.");
+        }
+
+        int index = ((Double)indexObject).intValue();
+        if (index >= list.size()) {
+            throw new RuntimeError(expr.name,
+                "Array index out of range.");
+        }
+
+        return list.get(index);
+    }
+
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double)
             return;
